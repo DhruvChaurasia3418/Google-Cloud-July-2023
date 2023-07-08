@@ -5,6 +5,10 @@ gcloud config list project
 
 gcloud config set compute/zone us-central1-f
 
+export REGION=us-central1
+
+export ZONE=us-central1-c
+
 gcloud services enable compute.googleapis.com
 
 gsutil mb gs://fancy-store-$DEVSHELL_PROJECT_ID
