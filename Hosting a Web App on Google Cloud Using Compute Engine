@@ -84,34 +84,40 @@ gcloud compute firewall-rules create fw-be \
 
 gcloud compute instances list
 
-gcloud compute instances stop frontend
+gcloud compute instances stop frontend --zone=$ZONE
 
-gcloud compute instances stop backend
+gcloud compute instances stop backend --zone=$ZONE
 
 gcloud compute instance-templates create fancy-fe \
+    --source-instance-zone=$ZONE \
     --source-instance=frontend
 
 gcloud compute instance-templates create fancy-be \
+    --source-instance-zone=$ZONE \
     --source-instance=backend
 
 gcloud compute instance-templates list
 
-gcloud compute instances delete --quiet  backend
+gcloud compute instances delete backend --zone=$ZONE
 
 gcloud compute instance-groups managed create fancy-fe-mig \
+    --zone=$ZONE \
     --base-instance-name fancy-fe \
     --size 2 \
     --template fancy-fe
 
 gcloud compute instance-groups managed create fancy-be-mig \
+    --zone=$ZONE \
     --base-instance-name fancy-be \
     --size 2 \
     --template fancy-be
 
 gcloud compute instance-groups set-named-ports fancy-fe-mig \
+    --zone=$ZONE \
     --named-ports frontend:8080
 
 gcloud compute instance-groups set-named-ports fancy-be-mig \
+    --zone=$ZONE \
     --named-ports orders:8081,products:8082
 
 gcloud compute health-checks create http fancy-fe-hc \
@@ -135,10 +141,12 @@ gcloud compute firewall-rules create allow-health-check \
     --network default
 
 gcloud compute instance-groups managed update fancy-fe-mig \
+    --zone=$ZONE \
     --health-check fancy-fe-hc \
     --initial-delay 300
 
 gcloud compute instance-groups managed update fancy-be-mig \
+    --zone=$ZONE \
     --health-check fancy-be-hc \
     --initial-delay 300
 
@@ -170,18 +178,18 @@ gcloud compute backend-services create fancy-be-products \
   --global
 
 gcloud compute backend-services add-backend fancy-fe-frontend \
+  --instance-group-zone=$ZONE \
   --instance-group fancy-fe-mig \
-  --instance-group-zone us-central1-f \
   --global
 
 gcloud compute backend-services add-backend fancy-be-orders \
+  --instance-group-zone=$ZONE \
   --instance-group fancy-be-mig \
-  --instance-group-zone us-central1-f \
   --global
 
 gcloud compute backend-services add-backend fancy-be-products \
+  --instance-group-zone=$ZONE \
   --instance-group fancy-be-mig \
-  --instance-group-zone us-central1-f \
   --global
 
 gcloud compute url-maps create fancy-map \
